@@ -1,9 +1,8 @@
-- Create project
-  expo init tor
-  cd tor
+- go into project folder
+  cd fintor
+
+- Install Node Packages
+  npm install
+
 - Run project
   expo start
-- Install Node Packages
-  npm install @apollo/client graphql
-  @react-navigation/native
-  npm install @react-navigation/drawer

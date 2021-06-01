@@ -10,21 +10,17 @@ import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import RecipeList from "./RecipeList";
 import FavoriteList from "./FavoriteList";
 
-import styles from "../../theme/styles";
-
 import { TabView, SceneMap } from "react-native-tab-view";
 
 const ReceiptRoute = () => (
   <View style={{ flex: 1, backgroundColor: "white" }}>
-    <RecipeList
-    // refresh={refresh}
-    />
+    <RecipeList />
   </View>
 );
 
 const FavoriteRoute = () => (
   <View style={{ flex: 1, backgroundColor: "white" }}>
-    {/* <FavoriteList /> */}
+    <FavoriteList />
   </View>
 );
 
@@ -36,7 +32,6 @@ export default function Profile({ navigation }) {
   //   index: 0,
   //   bluriii: true,
   // };
-  const [refresh] = useState(false);
 
   const layout = useWindowDimensions();
   const [index, setIndex] = React.useState(0);

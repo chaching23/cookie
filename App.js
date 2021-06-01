@@ -1,18 +1,27 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, TouchableOpacity, View, Text, Button } from "react-native";
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 // import { createDrawerNavigator } from "@react-navigation/drawer";
-
-import { Feather, Entypo } from "@expo/vector-icons";
+import { Feather, Entypo, Ionicons } from "@expo/vector-icons";
 import Show from "./src/screens/Show.js";
 import AddRecipe from "./src/screens/AddRecipe";
 import Edit from "./src/screens/Edit";
 import Profile from "./src/screens/Profile";
 import History from "./src/screens/History";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { Provider } from "react-redux";
+import configureStore from "./src/store";
+import {
+  getFavoriteData,
+  getFavoriteIdsData,
+  removeFavoriteIdsData,
+} from "./src/utils/storage.js";
+import actionCreator from "./src/utils/actionCreator.js";
+import { FETCH_FAVORITES } from "./src/reducers/constants.js";
+const store = configureStore();
 
 // import * as React from "react";
 
@@ -92,16 +101,56 @@ function MainStackScreen({ navigation }) {
 }
 
 function App() {
+  useEffect(() => {
+    async function fetchData() {
+      const favorites = await getFavoriteData();
+      const favoriteIds = await getFavoriteIdsData();
+      if (favorites && favoriteIds) {
+        store.dispatch(
+          actionCreator(FETCH_FAVORITES, { favorites, favoriteIds })
+        );
+      }
+    }
+    fetchData();
+  }, []);
   return (
-    <ApolloProvider client={client}>
-      <NavigationContainer>
-        <RootStack.Navigator mode="modal" headerMode="none">
-          <RootStack.Screen name="Main" component={MainStackScreen} />
-          <RootStack.Screen name="MyModal" component={ModalScreen} />
-          {/* <RootStack.Screen name="Drawer" component={DrawerScreen} /> */}
-        </RootStack.Navigator>
-      </NavigationContainer>
-    </ApolloProvider>
+    <Provider store={store}>
+      <ApolloProvider client={client}>
+        <NavigationContainer>
+          <RootStack.Navigator mode="modal" headerMode="none">
+            <RootStack.Screen name="Main" component={MainStackScreen} />
+            <RootStack.Screen
+              name="MyModal"
+              component={ModalScreen}
+              options={{
+                headerLeft: (props) => (
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: "center",
+                      flexDirection: "row",
+                      marginRight: 10,
+                    }}
+                  >
+                    <Ionicons
+                      style={{
+                        paddingRight: 5,
+                      }}
+                      name={"arrow-back"}
+                      size={24}
+                      color="#007aff"
+                      onPress={props.onPress}
+                      style={{ marginLeft: 10 }}
+                    />
+                  </View>
+                ),
+              }}
+            />
+            {/* <RootStack.Screen name="Drawer" component={DrawerScreen} /> */}
+          </RootStack.Navigator>
+        </NavigationContainer>
+      </ApolloProvider>
+    </Provider>
   );
 }
 
@@ -125,43 +174,3 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-
-// const RootStack = createStackNavigator();
-// const MainStack = createStackNavigator();
-
-// export default function App() {
-//   return (
-//     <ApolloProvider client={client}>
-//       <NavigationContainer>
-//         <RootStack.Navigator>
-//           <RootStack.Screen
-//             name="@CookieMan"
-//             component={Profile}
-//             options={{
-//               headerRight: () => (
-//                 <TouchableOpacity
-//                   // onPress={() => navigation.navigate("Add")}
-//                   style={styles.rightIcon}
-//                 >
-//                   <Entypo name="plus" size={26} color="#24cc94" />
-//                 </TouchableOpacity>
-//               ),
-//               headerLeft: () => (
-//                 <TouchableOpacity
-//                   // onPress={() => navigation.navigate("EditRecipe")}
-//                   style={styles.leftIcon}
-//                 >
-//                   <Feather name="menu" size={26} color="#24cc94" />
-//                 </TouchableOpacity>
-//               ),
-//             }}
-//           />
-//           <RootStack.Screen name="EditRecipe" component={Edit} />
-//           <RootStack.Screen name="Add" component={AddRecipe} />
-//           <RootStack.Screen name="ViewRecipe" component={Show} />
-//           <RootStack.Screen name="History" component={History} />
-//         </RootStack.Navigator>
-//       </NavigationContainer>
-//     </ApolloProvider>
-//   );
-// }
